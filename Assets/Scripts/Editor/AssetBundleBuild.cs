@@ -16,27 +16,27 @@ public class AssetBundleBuild
     static List<AssetBundleBuild> maps = new List<AssetBundleBuild>();
     public static string sourcePath = Application.dataPath + "/Resources";
     private static Dictionary<string, int> map;
-    const string AssetBundlesOutputPath = "Assets/StreamingAssets";
+    private static string AssetBundlesOutputPath = "Assets/StreamingAssets";
+    private static string outputPaht = Application.dataPath + "/../Assetbundle";
 
     [MenuItem("Tools/AssetBundle/Build")]
     public static void BuildAssetBundle()
     {
+        AssetBundlesOutputPath = outputPaht;
         Caching.CleanCache();
         ClearAssetBundlesName();
-
         Pack(sourcePath);
-
         string outputPath = Path.Combine(AssetBundlesOutputPath, Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget));
-        if (!Directory.Exists(Application.dataPath + "/../Assetbundle"))
+        if (!Directory.Exists(AssetBundlesOutputPath))
         {
-            Directory.CreateDirectory(Application.dataPath + "/../Assetbundle");
+            Directory.CreateDirectory(AssetBundlesOutputPath);
         }
         Debug.Log(outputPath);
         //根据BuildSetting里面所激活的平台进行打包
-        // BuildPipeline.BuildAssetBundles(outputPath, 0, EditorUserBuildSettings.activeBuildTarget);
-        BuildPipeline.BuildAssetBundles(Application.dataPath + "/../Assetbundle", BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.Android);
+        BuildPipeline.BuildAssetBundles(AssetBundlesOutputPath, BuildAssetBundleOptions.UncompressedAssetBundle, EditorUserBuildSettings.activeBuildTarget);
         BuildFileIndex();
         AssetDatabase.Refresh();
+
         Debug.Log("打包完成");
 
     }
@@ -47,20 +47,11 @@ public class AssetBundleBuild
     /// </summary>
     static void ClearAssetBundlesName()
     {
-        int length = AssetDatabase.GetAllAssetBundleNames().Length;
-        Debug.Log(length);
-        string[] oldAssetBundleNames = new string[length];
-        for (int i = 0; i < length; i++)
+        string[] oldAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+        for (int i = 0; i < oldAssetBundleNames.Length; i++)
         {
-            oldAssetBundleNames[i] = AssetDatabase.GetAllAssetBundleNames()[i];
+            AssetDatabase.RemoveAssetBundleName(oldAssetBundleNames[i], true);
         }
-
-        for (int j = 0; j < oldAssetBundleNames.Length; j++)
-        {
-            AssetDatabase.RemoveAssetBundleName(oldAssetBundleNames[j], true);
-        }
-        length = AssetDatabase.GetAllAssetBundleNames().Length;
-        Debug.Log(length);
     }
 
     static void Pack(string source)
@@ -107,12 +98,12 @@ public class AssetBundleBuild
     static void BuildFileIndex()
     {
         string resPath = AppDataPath + "/StreamingAssets/";
-        resPath = Application.dataPath + "/../Assetbundle";
         ///----------------------创建文件列表-----------------------
         string newFilePath = resPath + "/files.txt";
         if (File.Exists(newFilePath)) File.Delete(newFilePath);
 
-        paths.Clear(); files.Clear();
+        paths.Clear(); 
+        files.Clear();
         Recursive(resPath);
 
         FileStream fs = new FileStream(newFilePath, FileMode.CreateNew);
@@ -123,12 +114,13 @@ public class AssetBundleBuild
             string ext = Path.GetExtension(file);
             if (file.EndsWith(".meta") || file.Contains(".DS_Store")) continue;
 
-            string md5 = md5file(file);
+            string md5 = Utils.md5file(file);
             string value = file.Replace(resPath, string.Empty);
             FileInfo info = new FileInfo(file);
             sw.WriteLine(value + "|" + md5 + "|" + info.Length);
         }
-        sw.Close(); fs.Close();
+        sw.Close(); 
+        fs.Close();
     }
     /// <summary>
     /// 数据目录
@@ -160,49 +152,6 @@ public class AssetBundleBuild
         {
             paths.Add(dir.Replace('\\', '/'));
             Recursive(dir);
-        }
-    }
-    /// <summary>
-    /// 计算字符串的MD5值
-    /// </summary>
-    public static string md5(string source)
-    {
-        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(source);
-        byte[] md5Data = md5.ComputeHash(data, 0, data.Length);
-        md5.Clear();
-
-        string destString = "";
-        for (int i = 0; i < md5Data.Length; i++)
-        {
-            destString += System.Convert.ToString(md5Data[i], 16).PadLeft(2, '0');
-        }
-        destString = destString.PadLeft(32, '0');
-        return destString;
-    }
-
-    /// <summary>
-    /// 计算文件的MD5值
-    /// </summary>
-    public static string md5file(string file)
-    {
-        try
-        {
-            FileStream fs = new FileStream(file, FileMode.Open);
-            System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            byte[] retVal = md5.ComputeHash(fs);
-            fs.Close();
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < retVal.Length; i++)
-            {
-                sb.Append(retVal[i].ToString("x2"));
-            }
-            return sb.ToString();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("md5file() fail, error:" + ex.Message);
         }
     }
 }
