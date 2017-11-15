@@ -137,7 +137,12 @@ public class AssetBundleBuild
     {
         get { return Application.dataPath.ToLower(); }
     }
-
+    static void UpdateProgress(int progress, int progressMax, string desc)
+    {
+        string title = "Processing...[" + progress + " - " + progressMax + "]";
+        float value = (float)progress / (float)progressMax;
+        EditorUtility.DisplayProgressBar(title, desc, value);
+    }
     /// <summary>
     /// 遍历目录及其子目录
     /// </summary>
