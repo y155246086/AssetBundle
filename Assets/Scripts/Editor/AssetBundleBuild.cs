@@ -22,29 +22,24 @@ public class AssetBundleBuild
     [MenuItem("Tools/AssetBundle/Build")]
     public static void BuildAssetBundle()
     {
-        AssetBundlesOutputPath = outputPaht;
+        //AssetBundlesOutputPath = outputPaht;
         Caching.CleanCache();
         ClearAssetBundlesName();
         Pack(sourcePath);
         string outputPath = Path.Combine(AssetBundlesOutputPath, Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget));
-        if (!Directory.Exists(AssetBundlesOutputPath))
+        outputPath = AssetBundlesOutputPath + "/" + Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget) + "/";
+        if (!Directory.Exists(outputPath))
         {
-            Directory.CreateDirectory(AssetBundlesOutputPath);
+            Directory.CreateDirectory(outputPath);
         }
         Debug.Log(outputPath);
-        //根据BuildSetting里面所激活的平台进行打包
-        BuildPipeline.BuildAssetBundles(AssetBundlesOutputPath, BuildAssetBundleOptions.UncompressedAssetBundle, EditorUserBuildSettings.activeBuildTarget);
-        BuildFileIndex();
+        BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.UncompressedAssetBundle, EditorUserBuildSettings.activeBuildTarget);
+        BuildFileIndex(outputPath);
         AssetDatabase.Refresh();
 
         Debug.Log("打包完成");
 
     }
-
-    /// <summary>
-    /// 清除之前设置过的AssetBundleName，避免产生不必要的资源也打包
-    /// 之前说过，只要设置了AssetBundleName的，都会进行打包，不论在什么目录下
-    /// </summary>
     static void ClearAssetBundlesName()
     {
         string[] oldAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
@@ -80,13 +75,10 @@ public class AssetBundleBuild
         string _source = Replace(source);
         string _assetPath = "Assets" + _source.Substring(Application.dataPath.Length);
         string _assetPath2 = _source.Substring(Application.dataPath.Length + 1);
-        //Debug.Log (_assetPath);
 
-        //在代码中给资源设置AssetBundleName
         AssetImporter assetImporter = AssetImporter.GetAtPath(_assetPath);
         string assetName = _assetPath2.Substring(_assetPath2.IndexOf("/") + 1);
         assetName = assetName.Replace(Path.GetExtension(assetName), ".unity3d");
-        //Debug.Log (assetName);
         assetImporter.assetBundleName = assetName;
     }
 
@@ -95,9 +87,10 @@ public class AssetBundleBuild
         return s.Replace("\\", "/");
     }
 
-    static void BuildFileIndex()
+    static void BuildFileIndex(string outputPath)
     {
-        string resPath = AppDataPath + "/StreamingAssets/";
+        string resPath = outputPath;
+
         ///----------------------创建文件列表-----------------------
         string newFilePath = resPath + "/files.txt";
         if (File.Exists(newFilePath)) File.Delete(newFilePath);
@@ -115,6 +108,7 @@ public class AssetBundleBuild
             if (file.EndsWith(".meta") || file.Contains(".DS_Store")) continue;
 
             string md5 = Utils.md5file(file);
+            resPath = Replace(resPath);
             string value = file.Replace(resPath, string.Empty);
             FileInfo info = new FileInfo(file);
             sw.WriteLine(value + "|" + md5 + "|" + info.Length);

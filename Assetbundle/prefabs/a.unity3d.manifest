@@ -1,17 +1,15 @@
 ManifestFileVersion: 0
-CRC: 4080817161
+CRC: 1502883725
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: ed612c0cd141267cb7fe32dbcc2d2e12
+    Hash: 37046cc364da65e842029040ccede50e
   TypeTreeHash:
     serializedVersion: 2
-    Hash: a450853eb21b6d2064d9ac512f885d4c
+    Hash: f0cd318817949120dc67cc78f16ec8b3
 HashAppended: 0
 ClassTypes:
 - Class: 1
-  Script: {instanceID: 0}
-- Class: 28
   Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
@@ -25,4 +23,5 @@ ClassTypes:
   Script: {instanceID: 0}
 Assets:
 - Assets/Resources/Prefabs/A.prefab
-Dependencies: []
+Dependencies:
+- H:/myproject/AssetBundle/Assets/../Assetbundle/buttonacceleratoroversprite.unity3d
