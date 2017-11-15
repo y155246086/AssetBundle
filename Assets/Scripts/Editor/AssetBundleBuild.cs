@@ -27,7 +27,8 @@ public class AssetBundleBuild
         ClearAssetBundlesName();
         Pack(sourcePath);
         string outputPath = Path.Combine(AssetBundlesOutputPath, Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget));
-        outputPath = AssetBundlesOutputPath + "/" + Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget) + "/";
+        //outputPath = AssetBundlesOutputPath + "/" + Platform.GetPlatformFolder(EditorUserBuildSettings.activeBuildTarget) + "/";
+        outputPath = AssetBundlesOutputPath;
         if (!Directory.Exists(outputPath))
         {
             Directory.CreateDirectory(outputPath);
