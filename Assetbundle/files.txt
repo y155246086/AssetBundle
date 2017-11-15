@@ -1,0 +1,6 @@
+/Assetbundle|b8f64c81478d480de9ab327008fbaed3|4449
+/Assetbundle.manifest|ab14ce4172185a371ad8c9c3e9c2baa3|210
+/prefabs/a.unity3d|1849e799ba3f2404d55aa40ec043d292|99298
+/prefabs/a.unity3d.manifest|b246bcbc06e4bce5e1e251d018550f97|629
+/prefabs/b.unity3d|f469e2495b4aaf95e652a03d34eca687|99298
+/prefabs/b.unity3d.manifest|acea09203d49d487c2e2fc4597b57c75|629
